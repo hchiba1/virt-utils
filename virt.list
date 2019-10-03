@@ -50,7 +50,7 @@ for my $path (@list) {
     if ($path =~ /^(\S+)\/(\S+)$/) {
 	my ($dir, $file) = ($1, $2);
 	my $virt_pid = 0;
-	if (-f "$dir/virtuoso.lck";) {
+	if (-f "$dir/virtuoso.lck") {
 	    $virt_pid = `cat $dir/virtuoso.lck`;
 	    chomp($virt_pid);
 	    if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
