@@ -63,8 +63,8 @@ for my $path (@list) {
 	    } else {
 		print "$dir\n";
 		print "\n";
-		next;
 	    }
+	    next;
 	}
 	if ($virt_pid and $PS{$virt_pid}) {
 	} else {
