@@ -10,7 +10,12 @@ my $USAGE=
 my %OPT;
 getopts('a', \%OPT);
 
-chdir("/work");
+if (-d "/work") {
+    chdir("/work");
+} else {
+    die;
+}
+    
 
 my @ps_list = `ps.pl 2>/dev/null`;
 chomp(@ps_list);
@@ -39,22 +44,24 @@ for my $top_info (@top_list) {
     }
 }
 
-my @list = `ls */*.lck`;
+my @list = `ls */virtuoso.ini`;
 chomp(@list);
 for my $path (@list) {
     if ($path =~ /^(\S+)\/(\S+)$/) {
-	my ($dir, $lck_file) = ($1, $2);
-	my $virt_pid = `cat $path`;
-	chomp($virt_pid);
-	if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
-	    $virt_pid = $1;
-	} else {
-	    die;
-	}
-
-	if (! $PS{$virt_pid}) {
-	    if (!$OPT{a}) {
-		next;
+	my ($dir, $file) = ($1, $2);
+	my $virt_pid = 0;
+	if (-f "$dir/virtuoso.lck";) {
+	    $virt_pid = `cat $dir/virtuoso.lck`;
+	    chomp($virt_pid);
+	    if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
+		$virt_pid = $1;
+	    } else {
+		die;
+	    }
+	    if (!$PS{$virt_pid}) {
+		if (!$OPT{a}) {
+		    next;
+		}
 	    }
 	}
 
