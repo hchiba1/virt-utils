@@ -52,10 +52,11 @@ for my $path (@list) {
 	} else {
 	    die;
 	}
+
 	if ($PS{$virt_pid}) {
-	    print "PID=", $virt_pid, "\n";
 	    print $PS{user}{$virt_pid}, "\n";
-	    print $PS{mem}{$virt_pid}, "\n";
+	    print "PID=", $virt_pid, "\n";
+	    print "MEM: ", $PS{mem}{$virt_pid}, "\n";
 	    # print $PS{$virt_pid}, "\n";
 	}
 	if ($TOP{$virt_pid}) {
