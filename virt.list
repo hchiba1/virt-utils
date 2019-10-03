@@ -8,7 +8,7 @@ my $USAGE=
 ";
 
 my %OPT;
-getopts('', \%OPT);
+getopts('a', \%OPT);
 
 chdir("/work");
 
@@ -53,6 +53,12 @@ for my $path (@list) {
 	    die;
 	}
 
+	if (! $PS{$virt_pid}) {
+	    if (!$OPT{a}) {
+		next;
+	    }
+	}
+
 	if ($PS{$virt_pid}) {
 	    print "  [",$PS{user}{$virt_pid}, "] $virt_pid\n";
 	}
@@ -62,19 +68,19 @@ for my $path (@list) {
 	if (@port) {
 	    if (@port == 2) {
 		my ($isql_port, $http_port) = @port;
-		print "  [HTTP] $http_port  [ISQL] $isql_port\n";
+		print "  [HTTP] $http_port [ISQL] $isql_port\n";
 	    } else {
 		die;
 	    }
 	}
 
 	if ($PS{$virt_pid}) {
-	    print "  MEM ", $PS{mem}{$virt_pid}, "\n";
+	    print "  [MEM] ", $PS{mem}{$virt_pid};
 	}
 	if ($TOP{$virt_pid}) {
-	    print "  CPU  ", $TOP{$virt_pid}, "%\n";
+	    print "  [CPU] ", $TOP{$virt_pid}, "%";
 	}
-
+	print "\n";
 	print "\n";
     } else {
 	die;
