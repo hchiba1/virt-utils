@@ -52,8 +52,8 @@ for my $path (@list) {
 	} else {
 	    die;
 	}
-	# print "PID=", $virt_pid, "\n";
 	if ($PS{$virt_pid}) {
+	    print "PID=", $virt_pid, "\n";
 	    print $PS{user}{$virt_pid}, "\n";
 	    print $PS{mem}{$virt_pid}, "\n";
 	    # print $PS{$virt_pid}, "\n";
