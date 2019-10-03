@@ -78,9 +78,9 @@ for my $path (@list) {
 
 	if ($PS{$virt_pid}) {
 	    print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
+	    print "\n";
 	}
 	print_ports($path);
-	print "\n";
 
 	if ($PS{$virt_pid}) {
 	    print "  [MEM] ", $PS{mem}{$virt_pid};
@@ -107,6 +107,7 @@ sub print_ports {
     } elsif (@port == 2) {
 	my ($isql_port, $http_port) = @port;
 	print "  [HTTP] $http_port [ISQL] $isql_port";
+	print "\n";
     } else {
 	die;
     }
