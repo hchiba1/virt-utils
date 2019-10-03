@@ -62,6 +62,7 @@ for my $path (@list) {
 	    if ($virt_pid and $PS{$virt_pid}) {
 	    } else {
 		print "$dir\n";
+		print_ports($path);
 		print "\n";
 	    }
 	    next;
@@ -74,20 +75,12 @@ for my $path (@list) {
 	}
 
 	print "$dir\n";
+
 	if ($PS{$virt_pid}) {
 	    print "  [",$PS{user}{$virt_pid}, "] $virt_pid\n";
 	}
 
-	my @port = `cat $dir/virtuoso.ini | grep '^ServerPort' | cut 3`;
-	chomp(@port);
-	if (@port) {
-	    if (@port == 2) {
-		my ($isql_port, $http_port) = @port;
-		print "  [HTTP] $http_port [ISQL] $isql_port\n";
-	    } else {
-		die;
-	    }
-	}
+	print_ports($path);
 
 	if ($PS{$virt_pid}) {
 	    print "  [MEM] ", $PS{mem}{$virt_pid};
@@ -101,4 +94,20 @@ for my $path (@list) {
 	die;
     }
 
+}
+
+
+sub print_ports {
+    my ($path) = @_;
+    
+    my @port = `cat $path | grep '^ServerPort' | cut 3`;
+    chomp(@port);
+
+    if (@port == 0) {
+    } elsif (@port == 2) {
+	my ($isql_port, $http_port) = @port;
+	print "  [HTTP] $http_port [ISQL] $isql_port\n";
+    } else {
+	die;
+    }
 }
