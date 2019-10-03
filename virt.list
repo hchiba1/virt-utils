@@ -44,7 +44,7 @@ chomp(@list);
 for my $path (@list) {
     if ($path =~ /^(\S+)\/(\S+)$/) {
 	my ($dir, $lck_file) = ($1, $2);
-	print "\$dir\\n";
+	print "$dir\n";
 	my $virt_pid = `cat $path`;
 	chomp($virt_pid);
 	if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
