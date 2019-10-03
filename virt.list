@@ -8,7 +8,7 @@ my $USAGE=
 ";
 
 my %OPT;
-getopts('a', \%OPT);
+getopts('av', \%OPT);
 
 if (-d "/work") {
     chdir("/work");
@@ -39,7 +39,6 @@ for my $top_info (@top_list) {
 	my ($pid, $rest) = ($1, $2);
 	my @f = split(/\s+/, $rest);
 	my $cpu = $f[7];
-	# $TOP{$pid} = $top_info;
 	$TOP{$pid} = $cpu;
     }
 }
@@ -58,10 +57,16 @@ for my $path (@list) {
 	    } else {
 		die;
 	    }
-	    if (!$PS{$virt_pid}) {
-		if (!$OPT{a}) {
-		    next;
-		}
+	}
+	if ($OPT{v}) {
+	    print "$dir\n";
+	    print "\n";
+	    next;
+	}
+	if ($virt_pid and $PS{$virt_pid}) {
+	} else {
+	    if (!$OPT{a}) {
+		next;
 	    }
 	}
 
