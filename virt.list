@@ -1,0 +1,81 @@
+#!/usr/bin/perl -w
+use strict;
+use File::Basename;
+use Getopt::Std;
+my $PROGRAM = basename $0;
+my $USAGE=
+"Usage: $PROGRAM
+";
+
+my %OPT;
+getopts('', \%OPT);
+
+chdir("/work");
+
+my @ps_list = `ps.pl 2>/dev/null`;
+chomp(@ps_list);
+my %PS = ();
+for my $ps_info (@ps_list) {
+    if ($ps_info =~ /^ *(\d+) +(.*)/) {
+	my ($pid, $rest) = ($1, $2);
+	my @f = split(/\s+/, $rest);
+	my ($mem, $user) = @f[1,4];
+	$PS{mem}{$pid} = $mem;
+	$PS{user}{$pid} = $user;
+	$PS{$pid} = $ps_info;
+    }
+}
+
+my @top_list = `top -b -n1`;
+chomp(@top_list);
+my %TOP = ();
+for my $top_info (@top_list) {
+    if ($top_info =~ /^ *(\d+) +(.*)/) {
+	my ($pid, $rest) = ($1, $2);
+	my @f = split(/\s+/, $rest);
+	my $cpu = $f[7];
+	# $TOP{$pid} = $top_info;
+	$TOP{$pid} = $cpu;
+    }
+}
+
+my @list = `ls */*.lck`;
+chomp(@list);
+for my $path (@list) {
+    if ($path =~ /^(\S+)\/(\S+)$/) {
+	my ($dir, $lck_file) = ($1, $2);
+	print "\[$dir\]\n";
+	my $virt_pid = `cat $path`;
+	chomp($virt_pid);
+	if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
+	    $virt_pid = $1;
+	} else {
+	    die;
+	}
+	# print "PID=", $virt_pid, "\n";
+	if ($PS{$virt_pid}) {
+	    print $PS{user}{$virt_pid}, "\n";
+	    print $PS{mem}{$virt_pid}, "\n";
+	    # print $PS{$virt_pid}, "\n";
+	}
+	if ($TOP{$virt_pid}) {
+	    print "CPU  ", $TOP{$virt_pid}, "%\n";
+	}
+
+	my @port = `cat $dir/virtuoso.ini | grep '^ServerPort' | cut 3`;
+	chomp(@port);
+	if (@port) {
+	    if (@port == 2) {
+		my ($isql_port, $http_port) = @port;
+		print "HTTP  $http_port\nISQL  $isql_port\n";
+	    } else {
+		die;
+	    }
+	}
+
+	print "\n";
+    } else {
+	die;
+    }
+
+}
