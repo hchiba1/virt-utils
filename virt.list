@@ -58,13 +58,16 @@ for my $path (@list) {
 		die;
 	    }
 	}
-	if ($virt_pid and $PS{$virt_pid}) {
-	} else {
-	    if ($OPT{v}) {
+	if ($OPT{v}) {
+	    if ($virt_pid and $PS{$virt_pid}) {
+	    } else {
 		print "$dir\n";
 		print "\n";
 		next;
 	    }
+	}
+	if ($virt_pid and $PS{$virt_pid}) {
+	} else {
 	    if (!$OPT{a}) {
 		next;
 	    }
