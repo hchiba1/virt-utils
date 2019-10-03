@@ -55,10 +55,6 @@ for my $path (@list) {
 
 	if ($PS{$virt_pid}) {
 	    print "  [",$PS{user}{$virt_pid}, "] $virt_pid\n";
-	    print "  MEM ", $PS{mem}{$virt_pid}, "\n";
-	}
-	if ($TOP{$virt_pid}) {
-	    print "  CPU  ", $TOP{$virt_pid}, "%\n";
 	}
 
 	my @port = `cat $dir/virtuoso.ini | grep '^ServerPort' | cut 3`;
@@ -70,6 +66,13 @@ for my $path (@list) {
 	    } else {
 		die;
 	    }
+	}
+
+	if ($PS{$virt_pid}) {
+	    print "  MEM ", $PS{mem}{$virt_pid}, "\n";
+	}
+	if ($TOP{$virt_pid}) {
+	    print "  CPU  ", $TOP{$virt_pid}, "%\n";
 	}
 
 	print "\n";
