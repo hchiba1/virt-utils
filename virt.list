@@ -4,7 +4,7 @@ use File::Basename;
 use Getopt::Std;
 my $PROGRAM = basename $0;
 my $USAGE=
-"Usage: $PROGRAM
+"Usage: $PROGRAM [WORK_DIR]
 ";
 
 my %OPT;
@@ -12,10 +12,17 @@ getopts('av', \%OPT);
 
 if (-d "/work") {
     chdir("/work");
-} else {
-    die;
 }
+
+if (@ARGV) {
+    my ($dir) = @ARGV;
     
+    if (-d "$dir") {
+        chdir("$dir");
+    } else {
+        die "$dir: $!";
+    }
+}
 
 my @ps_list = `ps.pl 2>/dev/null`;
 chomp(@ps_list);
