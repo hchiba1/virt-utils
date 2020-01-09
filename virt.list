@@ -8,7 +8,7 @@ my $USAGE=
 -a: show all
 -v: instances not working
 -h: help
-search \*/virtuoso.ini
+Search \*/virtuoso.ini in /work or WORK_DIR or current directory.
 ";
 
 my %OPT;
