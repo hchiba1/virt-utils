@@ -1,0 +1,61 @@
+#!/usr/bin/perl -w
+use strict;
+use File::Basename;
+use Getopt::Std;
+my $PROGRAM = basename $0;
+my $USAGE=
+"Usage: $PROGRAM NICK_NAME
+";
+
+my %OPT;
+getopts('', \%OPT);
+
+if (@ARGV != 1) {
+    print STDERR $USAGE;
+    print STDERR `virt -V`;
+    exit 1;
+}
+my $NICK_NAME = shift @ARGV;
+
+### Main ###
+
+delete_rules($NICK_NAME);
+
+delete_graphs($NICK_NAME);
+
+################################################################################
+### Functions ##################################################################
+################################################################################
+sub delete_rules {
+    my ($nick_name) = @_;
+
+    my @rule = `virt $nick_name -r`;
+    chomp(@rule);
+    for my $rule (@rule) {
+	my @f = split("\t", $rule);
+	if (@f == 2) {
+	    my ($rule_name, $graph) = @f;
+	    print "# Delete $rule_name $graph\n";
+	    system "virt $nick_name -d $rule_name '$graph'";
+	    print "\n";
+	}
+    }
+}
+
+sub delete_graphs {
+    my ($nick_name) = @_;
+
+    my @graph_uri = `spang $nick_name -G`;
+    chomp(@graph_uri);
+
+    for my $graph_uri (@graph_uri) {
+	if ($graph_uri =~ /^<(\S+)>$/) {
+	    my $graph_name = $1;
+	    print "# Delete <$graph_name>\n";
+	    system "virt $nick_name -D '$graph_name'";
+	    print "\n";
+	} else {
+	    print $graph_uri, "\n";
+	}
+    }
+}
