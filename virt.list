@@ -8,7 +8,12 @@ my $USAGE=
 -a: show all
 -v: instances not working
 -h: help
-Search \*/virtuoso.ini in /work/ or ~/virtuso/ WORK_DIR or current directory.
+Search \*/virtuoso.ini in the following directory
+ /work/
+ /opt/virtuoso
+ ~/virtuoso/
+ WORK_DIR
+ current directory
 ";
 
 my %OPT;
@@ -20,6 +25,10 @@ if ($OPT{h}) {
 
 if (-d "/work") {
     chdir("/work");
+}
+
+if (-d "/opt/virtuoso") {
+    chdir("/opt/virtuoso");
 }
 
 if (-d "$ENV{HOME}/virtuoso") {
