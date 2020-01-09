@@ -329,6 +329,9 @@ sub read_ini_file {
     open(INI_FILE, "$file") || die;
     while (<INI_FILE>) {
 	chomp;
+	if (/^\s*$/) {
+	    next;
+	}
 	if (/^\s*#/) {
 	    next;
 	}
