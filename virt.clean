@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+use strict;
+use File::Basename;
+use Getopt::Std;
+my $PROGRAM = basename $0;
+my $USAGE=
+"Usage: $PROGRAM
+";
+
+my %OPT;
+getopts('', \%OPT);
+
+my @FILE = ("virtuoso.db", "virtuoso-temp.db", "virtuoso.trx", "virtuoso.pxa");
+
+for my $file (@FILE) {
+    if (-f $file) {
+        if (unlink($file)) {
+            print STDERR "removed $file\n";
+        } else {
+            print STDERR "could not remove $file\n";
+        }
+    }
+}
