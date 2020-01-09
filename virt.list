@@ -7,10 +7,16 @@ my $USAGE=
 "Usage: $PROGRAM [WORK_DIR]
 -a: show all
 -v: instances not working
+-h: help
+search \*/virtuoso.ini
 ";
 
 my %OPT;
-getopts('av', \%OPT);
+getopts('avh', \%OPT);
+
+if ($OPT{h}) {
+    die $USAGE;
+}
 
 if (-d "/work") {
     chdir("/work");
