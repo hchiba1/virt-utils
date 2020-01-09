@@ -5,6 +5,8 @@ use Getopt::Std;
 my $PROGRAM = basename $0;
 my $USAGE=
 "Usage: $PROGRAM [WORK_DIR]
+-a: show all
+-v: instances not working
 ";
 
 my %OPT;
