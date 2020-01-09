@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+use strict;
+use File::Basename;
+use Getopt::Std;
+my $PROGRAM = basename $0;
+my $USAGE=
+"Usage: $PROGRAM NAME
+-v: print error lines also
+-V: print original lines
+";
+
+use DomRefine::General;
+
+my %OPT;
+getopts('vV', \%OPT);
+
+if (!@ARGV) {
+    print STDERR $USAGE;
+    print STDERR `virt -V`;
+    exit 1;
+}
+
+### Results ###
+my $FIRST_TIME = "";
+my $LAST_TIME = "";
+my $INDEX = 0;
+my $COUNT = 0;
+for my $line (`virt $ARGV[0] 'select * from db.dba.load_list;'`) {
+    if ($OPT{V}) {
+	print $line;
+	next;
+    }
+    chomp($line);
+    $line =~ s/^\t//;
+    $line =~ s/^(at line \d+ column \d+ of )/$1\t/;
+    $line =~ s/  +/\t/g;
+    my @f = split("\t", $line);
+    if ($line =~ /ll_/) {
+	print $line, "\n";
+    } elsif ($line =~ /^$/) {
+    } elsif ($line =~ /^SQL> $/) {
+    } elsif ($line !~ /http:/) {
+	if ($INDEX == 0) {
+	    next;
+	} elsif ($OPT{v}) {
+	    print "$line\n";
+	}
+    } elsif (@f == 8) {
+	my ($started, $done) = @f[3,4];
+	my @started = split(" ", $started);
+	my @done = split(" ", $done);
+	my ($start_time, $end_time) = ($started[1], $done[1]);
+	my $diff_time;
+	if ($start_time) {
+	    if (! $FIRST_TIME) {
+		$FIRST_TIME = $start_time;
+	    }
+	    if ($end_time) {
+		$diff_time = diff_time($start_time, $end_time);
+		$LAST_TIME = $end_time;
+	    }
+	}
+	$INDEX ++;
+	printf "%4d $line", $INDEX;
+	if (defined $diff_time) {
+	    printf "\t%.1f min", $diff_time / 60;
+	    $COUNT ++;
+	}
+	print "\n";
+    } elsif ($OPT{v}) {
+	print "$line\n";
+    }
+}
+
+### Print total time ###
+if ($FIRST_TIME and $LAST_TIME) {
+    my $sec = diff_time($FIRST_TIME, $LAST_TIME);
+    my $min = $sec / 60;
+    if ($COUNT != $INDEX) {
+	printf "$COUNT/$INDEX files, ";
+    }
+    printf "$sec sec = %.1f min", $min;
+    if ($COUNT != $INDEX) {
+	my $estimated = $min * $INDEX / $COUNT;
+	printf " (estimate %.1f min)", $estimated;
+    }
+    print "\n";
+}
