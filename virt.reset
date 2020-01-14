@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+use strict;
+use File::Basename;
+use Getopt::Std;
+my $PROGRAM = basename $0;
+my $USAGE=
+"Usage: $PROGRAM
+";
+
+my %OPT;
+getopts('', \%OPT);
+
+### Stop
+if (-f "virtuoso.lck") {
+    my $pid = `cat virtuoso.lck`;
+    chomp($pid);
+    if ($pid eq "") {
+        print STDERR "WARNING: Virtuoso is not running!\n";
+        exit(1);
+    } elsif ($pid =~ /^VIRT_PID=(\d+)$/) {
+        $pid = $1;
+        print "kill $pid\n";
+        system "kill $pid";
+    } else {
+        die;
+    }
+} else {
+    print STDERR "Virtuoso is not running!\n";
+}
+
+### Clean
+system "virt.clean";
+
+### Start
+if (-f "virtuoso.ini") {
+    my $server_root = `cat virtuoso.ini | grep '^ServerRoot' | head -1`;
+    my $virtuoso_command;
+    if ($server_root =~ /^ServerRoot\s*= *(\S+)\/var\/lib\/virtuoso\/vsp$/) {
+        my $dir = $1;
+        $virtuoso_command = "$dir/bin/virtuoso-t +wait";
+    } elsif (-f "../bin/virtuoso") {
+        $virtuoso_command = "../bin/virtuoso +wait";
+    } else {
+        die $server_root;
+    }
+    print "$virtuoso_command\n";
+    system "$virtuoso_command";
+} else {
+    die "can't find virtuoso.ini\n";
+}
