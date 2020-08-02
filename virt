@@ -153,7 +153,7 @@ if ($OPT{r}) {
 	die $USAGE;
     }
 } elsif ($OPT{i}) {
-	isql("SELECT COUNT(*) FROM DB.DBA.VTLOG_DB_DBA_RDF_OBJ;");
+	isql("SELECT COUNT(*) FROM DB.DBA.VTLOG_DB_DBA_RDF_OBJ;", extract_line => "1");
 } elsif ($OPT{d}) {
     if (@ARGV == 2) {
 	isql("rdfs_rule_set('$ARGV[0]', '$ARGV[1]', 1); ", extract_line => "time_1");
