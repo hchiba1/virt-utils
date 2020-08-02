@@ -206,37 +206,37 @@ sub isql {
     my $result = `echo \"$command\" | $ISQL`;
 
     if ($opt{extract_line}) {
-	if ($opt{extract_line} eq "1") {
-	    my @line = extract_lines_from_results($result);
-	    if (@line == 1) {
-		print "$line[0]\n";
-	    } else {
-		print "$result\n";
-	    }
-	} elsif ($opt{extract_line} eq "multi") {
-	    my @line = extract_lines_from_results($result);
-	    print join("\n", @line), "\n";
-	} elsif ($opt{extract_line} eq "rules") {
-	    print extract_rules_from_results($result);
-	} elsif ($opt{extract_line} eq "time_1") {
-	    my $time = extract_time_from_results($result);
-	    if (defined $time) {
-		print "$time sec\n";
-	    } else {
-		print $result;
-	    }
-	} elsif ($opt{extract_line} eq "times_3") {
-	    my @time = extract_times_3_from_results($result);
-	    if (@time) {
-		print join(" ", @time), " sec (log_enable, delete, checkpoint)\n";
-	    } else {
-		print $result;
-	    }
-	} else {
-	    die;
-	}
+        if ($opt{extract_line} eq "1") {
+            my @line = extract_lines_from_results($result);
+            if (@line == 1) {
+                print "$line[0]\n";
+            } else {
+                print "$result\n";
+            }
+        } elsif ($opt{extract_line} eq "multi") {
+            my @line = extract_lines_from_results($result);
+            print join("\n", @line), "\n";
+        } elsif ($opt{extract_line} eq "rules") {
+            print extract_rules_from_results($result);
+        } elsif ($opt{extract_line} eq "time_1") {
+            my $time = extract_time_from_results($result);
+            if (defined $time) {
+                print "$time sec\n";
+            } else {
+                print $result;
+            }
+        } elsif ($opt{extract_line} eq "times_3") {
+            my @time = extract_times_3_from_results($result);
+            if (@time) {
+                print join(" ", @time), " sec (log_enable, delete, checkpoint)\n";
+            } else {
+                print $result;
+            }
+        } else {
+            die;
+        }
     } else {
-	return "$result\n";
+        return "$result\n";
     }
 }
 
