@@ -16,6 +16,7 @@ my $USAGE=
 -r : show rules
 -r RULE http://graph : create RULE
 -d RULE http://graph : delete RULE
+-i : inspect text index progress
 ";
 # -p: print settings
 # -P: print settings without newline
@@ -132,7 +133,7 @@ if (@ARGV && $ARGV[0] eq "start") {
 
 ### Options ###
 my %OPT;
-getopts('e:GC:D:rRdpPts', \%OPT);
+getopts('e:GC:D:rRdpPtsi', \%OPT);
 
 if ($OPT{p}) {
     print $ENV{VIRTUOSO_DB}, "\n";
@@ -151,6 +152,8 @@ if ($OPT{r}) {
     } else {
 	die $USAGE;
     }
+} elsif ($OPT{i}) {
+	isql("SELECT COUNT(*) FROM DB.DBA.VTLOG_DB_DBA_RDF_OBJ;");
 } elsif ($OPT{d}) {
     if (@ARGV == 2) {
 	isql("rdfs_rule_set('$ARGV[0]', '$ARGV[1]', 1); ", extract_line => "time_1");
