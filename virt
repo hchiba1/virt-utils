@@ -305,20 +305,20 @@ sub extract_lines_from_results {
     my @result = split("\n", $results);
     my $i = 0;
     for (; $i<@result; $i++) {
-	$result[$i] eq "" and last;
+        $result[$i] eq "" and last;
     }
     $i++;
 
     my @content = ();
     for (; $i<@result; $i++) {
-	$result[$i] eq "" and last;
-	push @content, $result[$i];
+        $result[$i] eq "" and last;
+        push @content, $result[$i];
     }
 
     if (@content) {
-	return @content;
+        return @content;
     } else {
-	return @result;
+        return @result;
     }
 }
 
