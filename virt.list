@@ -71,8 +71,9 @@ for my $top_info (@top_list) {
     }
 }
 
-my @list = `ls */virtuoso.ini`;
+my @list = `ls */virtuoso.ini 2>/dev/null`;
 chomp(@list);
+push(@list, "./virtuoso.ini");
 for my $path (@list) {
     if ($path =~ /^(\S+)\/(\S+)$/) {
 	my ($dir, $file) = ($1, $2);
