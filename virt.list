@@ -23,56 +23,47 @@ if ($OPT{h}) {
     die $USAGE;
 }
 
+my %PS = ();
+get_ps_list();
+
+my %TOP = ();
+get_top_list();
+
 if (-d "/work") {
-    chdir("/work");
+    inspect_virt_ini("/work");
 }
 
 if (-d "/opt/virtuoso") {
-    chdir("/opt/virtuoso");
+    inspect_virt_ini("/opt/virtuoso");
 }
 
 if (-d "$ENV{HOME}/virtuoso") {
-    chdir("$ENV{HOME}/virtuoso");
+    inspect_virt_ini("$ENV{HOME}/virtuoso");
 }
 
 if (@ARGV) {
     my ($dir) = @ARGV;
-    
     if (-d "$dir") {
-        chdir("$dir");
+        inspect_virt_ini("$dir");
     } else {
         die "$dir: $!";
     }
 }
 
-my %PS = ();
-get_ps_list();
-
-my @top_list = `top -b -n1`;
-chomp(@top_list);
-my %TOP = ();
-for my $top_info (@top_list) {
-    if ($top_info =~ /^ *(\d+) +(.*)/) {
-        my ($pid, $rest) = ($1, $2);
-        my @f = split(/\s+/, $rest);
-        my $cpu = $f[7];
-        $TOP{$pid} = $cpu;
-    }
-}
-
-inspect_virt_ini();
-
 ################################################################################
 ### Functions ##################################################################
 ################################################################################
 sub get_ps_list {
+
     my @ps_list = `ps.pl 2>/dev/null`;
     chomp(@ps_list);
+
     for my $ps_info (@ps_list) {
         if ($ps_info =~ /^ *(\d+) +(.*)/) {
             my ($pid, $rest) = ($1, $2);
             my @f = split(/\s+/, $rest);
             my ($mem, $user) = @f[1,4];
+
             $PS{mem}{$pid} = $mem;
             $PS{user}{$pid} = $user;
             $PS{$pid} = $ps_info;
@@ -80,64 +71,83 @@ sub get_ps_list {
     }
 }
 
+sub get_top_list {
+
+    my @top_list = `top -b -n1`;
+    chomp(@top_list);
+
+    for my $top_info (@top_list) {
+        if ($top_info =~ /^ *(\d+) +(.*)/) {
+            my ($pid, $rest) = ($1, $2);
+            my @f = split(/\s+/, $rest);
+            my $cpu = $f[7];
+
+            $TOP{$pid} = $cpu;
+        }
+    }
+}
+
 sub inspect_virt_ini {
-    my @list = `ls */virtuoso.ini 2>/dev/null`;
-    chomp(@list);
-    push(@list, "./virtuoso.ini");
-    for my $path (@list) {
-        if ($path =~ /^(\S+)\/(\S+)$/) {
-            my ($dir, $file) = ($1, $2);
-            my $virt_pid = 0;
-            if (-f "$dir/virtuoso.lck") {
-                $virt_pid = `cat $dir/virtuoso.lck`;
-                chomp($virt_pid);
-                if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
-                    $virt_pid = $1;
-                } else {
-                    die;
-                }
-            }
-            if ($OPT{v}) {
-                if ($virt_pid and $PS{$virt_pid}) {
-                } else {
-                    print "$dir\n";
-                    print_ports($path);
-                    print "\n";
-                }
-                next;
-            }
-            if ($virt_pid and $PS{$virt_pid}) {
-            } else {
-                if (!$OPT{a}) {
-                    next;
-                }
-            }
+    my ($inspect_dir) = @_;
 
-        print "$dir\n";
+    print "[$inspect_dir]\n";
 
-        if ($PS{$virt_pid}) {
-            print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
-            print "\n";
-        }
-        print_ports($path);
+    chdir($inspect_dir);
+    my @virt_ini_list = `ls */virtuoso.ini 2>/dev/null`;
+    chomp(@virt_ini_list);
 
-        if ($PS{$virt_pid}) {
-            print "  [MEM] ", $PS{mem}{$virt_pid};
-        }
-        if ($TOP{$virt_pid}) {
-            print "  [CPU] ", $TOP{$virt_pid}, "%";
-        }
-        print "\n";
-        print "\n";
-    } else {
-        die;
+    if (-e "./virtuoso.ini") {
+        push(@virt_ini_list, "./virtuoso.ini");
     }
 
-}
+    for my $virt_ini (@virt_ini_list) {
+        if ($virt_ini =~ /^(\S+)\/\S+$/) {
+            my $db_dir = $1;
+            my $virt_pid = get_virt_pid($db_dir) || 0;
+            if ($OPT{v}) {
+                if (!$PS{$virt_pid}) {
+                    print_virt_info($virt_ini, $db_dir, $virt_pid);
+                }
+            } elsif ($OPT{a} or $PS{$virt_pid}) {
+                print_virt_info($virt_ini, $db_dir, $virt_pid);
+            }
+        } else {
+            die;
+        }
+    }
 }
 
-sub print_ports {
-    my ($path) = @_;
+sub get_virt_pid {
+    my ($dir) = @_;
+
+    if (-f "$dir/virtuoso.lck") {
+        my $virt_pid = `cat $dir/virtuoso.lck`;
+        chomp($virt_pid);
+        if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
+            return $1;
+        } else {
+            die;
+        }
+    }
+}
+
+sub print_ps_info {
+    my ($virt_pid) = @_;
+
+    if ($PS{$virt_pid}) {
+        print "  [MEM] ", $PS{mem}{$virt_pid};
+    }
+    if ($TOP{$virt_pid}) {
+        print "  [CPU] ", $TOP{$virt_pid}, "%";
+    }
+    print "\n";
+}
+
+sub print_virt_info {
+    my ($path, $db_dir, $virt_pid) = @_;
+
+    print "\n";
+    print "$db_dir\n";
     
     my @port = `cat $path | grep '^ServerPort' | cut 3`;
     chomp(@port);
@@ -149,5 +159,13 @@ sub print_ports {
         print "\n";
     } else {
         die;
+    }
+
+    if ($PS{$virt_pid} or $TOP{$virt_pid}) {
+        print_ps_info($virt_pid);
+    }
+    if ($PS{$virt_pid}) {
+        print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
+        print "\n";
     }
 }
