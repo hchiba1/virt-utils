@@ -4,17 +4,17 @@ use File::Basename;
 use Getopt::Std;
 my $PROGRAM = basename $0;
 my $USAGE=
-"Usage: $PROGRAM [WORK_DIR]
--a: show all
--v: instances not working
--h: help
-Search \*/virtuoso.ini in the following directory
- /work/
- /opt/virtuoso
- ~/virtuoso/
- WORK_DIR
- current directory
-";
+    "Usage: $PROGRAM [WORK_DIR]
+    -a: show all
+    -v: instances not working
+    -h: help
+    Search \*/virtuoso.ini in the following directory
+    /work/
+    /opt/virtuoso
+    ~/virtuoso/
+    WORK_DIR
+    current directory
+    ";
 
 my %OPT;
 getopts('avh', \%OPT);
@@ -50,12 +50,12 @@ chomp(@ps_list);
 my %PS = ();
 for my $ps_info (@ps_list) {
     if ($ps_info =~ /^ *(\d+) +(.*)/) {
-	my ($pid, $rest) = ($1, $2);
-	my @f = split(/\s+/, $rest);
-	my ($mem, $user) = @f[1,4];
-	$PS{mem}{$pid} = $mem;
-	$PS{user}{$pid} = $user;
-	$PS{$pid} = $ps_info;
+        my ($pid, $rest) = ($1, $2);
+        my @f = split(/\s+/, $rest);
+        my ($mem, $user) = @f[1,4];
+        $PS{mem}{$pid} = $mem;
+        $PS{user}{$pid} = $user;
+        $PS{$pid} = $ps_info;
     }
 }
 
@@ -64,10 +64,10 @@ chomp(@top_list);
 my %TOP = ();
 for my $top_info (@top_list) {
     if ($top_info =~ /^ *(\d+) +(.*)/) {
-	my ($pid, $rest) = ($1, $2);
-	my @f = split(/\s+/, $rest);
-	my $cpu = $f[7];
-	$TOP{$pid} = $cpu;
+        my ($pid, $rest) = ($1, $2);
+        my @f = split(/\s+/, $rest);
+        my $cpu = $f[7];
+        $TOP{$pid} = $cpu;
     }
 }
 
@@ -76,51 +76,51 @@ chomp(@list);
 push(@list, "./virtuoso.ini");
 for my $path (@list) {
     if ($path =~ /^(\S+)\/(\S+)$/) {
-	my ($dir, $file) = ($1, $2);
-	my $virt_pid = 0;
-	if (-f "$dir/virtuoso.lck") {
-	    $virt_pid = `cat $dir/virtuoso.lck`;
-	    chomp($virt_pid);
-	    if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
-		$virt_pid = $1;
-	    } else {
-		die;
-	    }
-	}
-	if ($OPT{v}) {
-	    if ($virt_pid and $PS{$virt_pid}) {
-	    } else {
-		print "$dir\n";
-		print_ports($path);
-		print "\n";
-	    }
-	    next;
-	}
-	if ($virt_pid and $PS{$virt_pid}) {
-	} else {
-	    if (!$OPT{a}) {
-		next;
-	    }
-	}
+        my ($dir, $file) = ($1, $2);
+        my $virt_pid = 0;
+        if (-f "$dir/virtuoso.lck") {
+            $virt_pid = `cat $dir/virtuoso.lck`;
+            chomp($virt_pid);
+            if ($virt_pid =~ /^VIRT_PID=(\d+)$/) {
+                $virt_pid = $1;
+            } else {
+                die;
+            }
+        }
+        if ($OPT{v}) {
+            if ($virt_pid and $PS{$virt_pid}) {
+            } else {
+                print "$dir\n";
+                print_ports($path);
+                print "\n";
+            }
+            next;
+        }
+        if ($virt_pid and $PS{$virt_pid}) {
+        } else {
+            if (!$OPT{a}) {
+                next;
+            }
+        }
 
-	print "$dir\n";
+        print "$dir\n";
 
-	if ($PS{$virt_pid}) {
-	    print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
-	    print "\n";
-	}
-	print_ports($path);
+        if ($PS{$virt_pid}) {
+            print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
+            print "\n";
+        }
+        print_ports($path);
 
-	if ($PS{$virt_pid}) {
-	    print "  [MEM] ", $PS{mem}{$virt_pid};
-	}
-	if ($TOP{$virt_pid}) {
-	    print "  [CPU] ", $TOP{$virt_pid}, "%";
-	}
-	print "\n";
-	print "\n";
+        if ($PS{$virt_pid}) {
+            print "  [MEM] ", $PS{mem}{$virt_pid};
+        }
+        if ($TOP{$virt_pid}) {
+            print "  [CPU] ", $TOP{$virt_pid}, "%";
+        }
+        print "\n";
+        print "\n";
     } else {
-	die;
+        die;
     }
 
 }
@@ -134,10 +134,10 @@ sub print_ports {
 
     if (@port == 0) {
     } elsif (@port == 2) {
-	my ($isql_port, $http_port) = @port;
-	print "  [HTTP] $http_port [ISQL] $isql_port";
-	print "\n";
+        my ($isql_port, $http_port) = @port;
+        print "  [HTTP] $http_port [ISQL] $isql_port";
+        print "\n";
     } else {
-	die;
+        die;
     }
 }
