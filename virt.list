@@ -125,7 +125,6 @@ for my $path (@list) {
 
 }
 
-
 sub print_ports {
     my ($path) = @_;
     
