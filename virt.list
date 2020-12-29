@@ -71,6 +71,12 @@ for my $top_info (@top_list) {
     }
 }
 
+inspect_virt_ini();
+
+################################################################################
+### Functions ##################################################################
+################################################################################
+sub inspect_virt_ini {
 my @list = `ls */virtuoso.ini 2>/dev/null`;
 chomp(@list);
 push(@list, "./virtuoso.ini");
@@ -123,6 +129,7 @@ for my $path (@list) {
         die;
     }
 
+}
 }
 
 sub print_ports {
