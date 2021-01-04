@@ -29,17 +29,9 @@ get_ps_list();
 my %TOP = ();
 get_top_list();
 
-if (-d "/work") {
-    inspect_virt_ini("/work");
-}
-
-if (-d "/opt/virtuoso") {
-    inspect_virt_ini("/opt/virtuoso");
-}
-
-if (-d "$ENV{HOME}/virtuoso") {
-    inspect_virt_ini("$ENV{HOME}/virtuoso");
-}
+inspect_virt_ini("/work");
+inspect_virt_ini("/opt/virtuoso");
+inspect_virt_ini("$ENV{HOME}/virtuoso");
 
 if (@ARGV) {
     my ($dir) = @ARGV;
@@ -90,12 +82,14 @@ sub get_top_list {
 sub inspect_virt_ini {
     my ($inspect_dir) = @_;
 
+    if (!-d $inspect_dir) {
+        return;
+    }
     print "[$inspect_dir]\n";
-
     chdir($inspect_dir);
+
     my @virt_ini_list = `ls */virtuoso.ini 2>/dev/null`;
     chomp(@virt_ini_list);
-
     if (-e "./virtuoso.ini") {
         push(@virt_ini_list, "./virtuoso.ini");
     }
