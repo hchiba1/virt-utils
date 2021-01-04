@@ -45,6 +45,65 @@ if (@ARGV) {
 ################################################################################
 ### Functions ##################################################################
 ################################################################################
+sub inspect_virt_ini {
+    my ($inspect_dir) = @_;
+
+    if (!-d $inspect_dir) {
+        return;
+    }
+    print "[$inspect_dir]\n";
+    chdir($inspect_dir);
+
+    my @virt_ini_list = `ls */virtuoso.ini 2>/dev/null`;
+    chomp(@virt_ini_list);
+    if (-e "./virtuoso.ini") {
+        push(@virt_ini_list, "./virtuoso.ini");
+    }
+
+    for my $virt_ini (@virt_ini_list) {
+        if ($virt_ini =~ /^(\S+)\/\S+$/) {
+            my $db_dir = $1;
+            my $virt_pid = get_virt_pid($db_dir) || 0;
+            if ($OPT{v}) {
+                if (!$PS{$virt_pid}) {
+                    print_virt_info($virt_ini, $db_dir, $virt_pid);
+                }
+            } elsif ($OPT{a} or $PS{$virt_pid}) {
+                print_virt_info($virt_ini, $db_dir, $virt_pid);
+            }
+        } else {
+            die;
+        }
+    }
+}
+
+sub print_virt_info {
+    my ($path, $db_dir, $virt_pid) = @_;
+
+    print "\n";
+    print "$db_dir\n";
+    
+    my @port = `cat $path | grep '^ServerPort' | cut 3`;
+    chomp(@port);
+
+    if (@port == 0) {
+    } elsif (@port == 2) {
+        my ($isql_port, $http_port) = @port;
+        print "  [HTTP] $http_port [ISQL] $isql_port";
+        print "\n";
+    } else {
+        die;
+    }
+
+    if ($PS{$virt_pid} or $TOP{$virt_pid}) {
+        print_ps_info($virt_pid);
+    }
+    if ($PS{$virt_pid}) {
+        print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
+        print "\n";
+    }
+}
+
 sub get_ps_list {
 
     my @ps_list = `ps.pl 2>/dev/null`;
@@ -79,38 +138,6 @@ sub get_top_list {
     }
 }
 
-sub inspect_virt_ini {
-    my ($inspect_dir) = @_;
-
-    if (!-d $inspect_dir) {
-        return;
-    }
-    print "[$inspect_dir]\n";
-    chdir($inspect_dir);
-
-    my @virt_ini_list = `ls */virtuoso.ini 2>/dev/null`;
-    chomp(@virt_ini_list);
-    if (-e "./virtuoso.ini") {
-        push(@virt_ini_list, "./virtuoso.ini");
-    }
-
-    for my $virt_ini (@virt_ini_list) {
-        if ($virt_ini =~ /^(\S+)\/\S+$/) {
-            my $db_dir = $1;
-            my $virt_pid = get_virt_pid($db_dir) || 0;
-            if ($OPT{v}) {
-                if (!$PS{$virt_pid}) {
-                    print_virt_info($virt_ini, $db_dir, $virt_pid);
-                }
-            } elsif ($OPT{a} or $PS{$virt_pid}) {
-                print_virt_info($virt_ini, $db_dir, $virt_pid);
-            }
-        } else {
-            die;
-        }
-    }
-}
-
 sub get_virt_pid {
     my ($dir) = @_;
 
@@ -135,31 +162,4 @@ sub print_ps_info {
         print "  [CPU] ", $TOP{$virt_pid}, "%";
     }
     print "\n";
-}
-
-sub print_virt_info {
-    my ($path, $db_dir, $virt_pid) = @_;
-
-    print "\n";
-    print "$db_dir\n";
-    
-    my @port = `cat $path | grep '^ServerPort' | cut 3`;
-    chomp(@port);
-
-    if (@port == 0) {
-    } elsif (@port == 2) {
-        my ($isql_port, $http_port) = @port;
-        print "  [HTTP] $http_port [ISQL] $isql_port";
-        print "\n";
-    } else {
-        die;
-    }
-
-    if ($PS{$virt_pid} or $TOP{$virt_pid}) {
-        print_ps_info($virt_pid);
-    }
-    if ($PS{$virt_pid}) {
-        print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
-        print "\n";
-    }
 }
