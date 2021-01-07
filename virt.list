@@ -78,12 +78,12 @@ sub inspect_virt_ini {
 }
 
 sub print_virt_info {
-    my ($path, $db_dir, $virt_pid) = @_;
+    my ($virt_ini, $db_dir, $virt_pid) = @_;
 
     print "\n";
     print "$db_dir/\n";
     
-    my @port = `cat $path | grep '^ServerPort' | cut 3`;
+    my @port = `cat $virt_ini | grep '^ServerPort' | cut 3`;
     chomp(@port);
 
     if (@port == 0) {
