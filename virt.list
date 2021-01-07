@@ -80,12 +80,10 @@ sub inspect_virt_ini {
 sub print_virt_info {
     my ($virt_ini, $db_dir, $virt_pid) = @_;
 
-    print "\n";
-    print "$db_dir/\n";
+    print "\n$db_dir/\n";
     
     my @port = `cat $virt_ini | grep '^ServerPort' | cut 3`;
     chomp(@port);
-
     if (@port == 0) {
     } elsif (@port == 2) {
         my ($isql_port, $http_port) = @port;
@@ -96,7 +94,13 @@ sub print_virt_info {
     }
 
     if ($PS{$virt_pid} or $TOP{$virt_pid}) {
-        print_ps_info($virt_pid);
+        if ($PS{$virt_pid}) {
+            print "  [MEM] ", $PS{mem}{$virt_pid};
+        }
+        if ($TOP{$virt_pid}) {
+            print "  [CPU] ", $TOP{$virt_pid}, "%";
+        }
+        print "\n";
     }
     if ($PS{$virt_pid}) {
         print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
@@ -150,16 +154,4 @@ sub get_virt_pid {
             die;
         }
     }
-}
-
-sub print_ps_info {
-    my ($virt_pid) = @_;
-
-    if ($PS{$virt_pid}) {
-        print "  [MEM] ", $PS{mem}{$virt_pid};
-    }
-    if ($TOP{$virt_pid}) {
-        print "  [CPU] ", $TOP{$virt_pid}, "%";
-    }
-    print "\n";
 }
