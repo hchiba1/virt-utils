@@ -75,6 +75,7 @@ sub inspect_virt_ini {
             die;
         }
     }
+    print "\n";
 }
 
 sub print_virt_info {
