@@ -118,7 +118,7 @@ sub get_ps_list {
         if ($ps_info =~ /^ *(\d+) +(.*)/) {
             my ($pid, $rest) = ($1, $2);
             my @f = split(/\s+/, $rest);
-            my ($mem, $user) = @f[1,4];
+            my ($mem, $user) = @f[1,6];
 
             $PS{mem}{$pid} = $mem;
             $PS{user}{$pid} = $user;
