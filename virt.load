@@ -72,12 +72,13 @@ if (@ARGV) {
     ($GRAPH_NAME) = @ARGV;
     $GRAPH_NAME =~ s/^<(.+)>$/$1/;
 } else {
-    $DATASET_NAME =~ s/^mbgd_//;
+    # $DATASET_NAME =~ s/^mbgd_//;
     $DATASET_NAME =~ s/.ttl$//;
     if ($OPT{s}) {
 	$DATASET_NAME .= "_$OPT{s}";
     }
-    $GRAPH_NAME = "http://mbgd.genome.ad.jp/rdf/resource/$DATASET_NAME";
+    # $GRAPH_NAME = "http://mbgd.genome.ad.jp/rdf/resource/$DATASET_NAME";
+    $GRAPH_NAME = "http://localhost/$DATASET_NAME";
 }
 
 my $CHECK_NUMBER_OF_TRIPLES = 0;
