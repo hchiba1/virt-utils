@@ -31,6 +31,7 @@ get_top_list();
 
 inspect_virt_ini("/work");
 inspect_virt_ini("/opt/virtuoso");
+inspect_virt_ini("$ENV{HOME}/work");
 inspect_virt_ini("$ENV{HOME}/virtuoso");
 
 if (@ARGV) {
@@ -58,6 +59,10 @@ sub inspect_virt_ini {
     chomp(@virt_ini_list);
     if (-e "./virtuoso.ini") {
         push(@virt_ini_list, "./virtuoso.ini");
+    }
+    if (my @list = `ls */var/lib/virtuoso/db/virtuoso.ini 2>/dev/null`) {
+        chomp(@list);
+        push(@virt_ini_list, @list);
     }
 
     for my $virt_ini (@virt_ini_list) {
