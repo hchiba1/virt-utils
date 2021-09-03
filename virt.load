@@ -19,8 +19,7 @@ parallel mode:
 -d INPUT_DIR
 -p N : number of parallelization (default 4)
 -U UNIT_SIZE : number of triples in each tmp input file (default 10M)
--N: N-Triples
--o: .owl files (with -p and -d)
+-F format: .format files (with -p and -d)
 ";
 
 my $TMP_DIR = "load.tmp";
@@ -48,7 +47,7 @@ my $VERSION = shift(@ARGV);
 
 ### Options ###
 my %OPT;
-getopts('f:ca:xbd:p:U:No', \%OPT);
+getopts('f:ca:xbd:p:U:F:', \%OPT);
 
 my $PWD = `pwd`;
 chomp($PWD);
@@ -105,12 +104,11 @@ if ($OPT{p}) {
     my $n_para = $OPT{p};
     my $unit_size = $OPT{U} || "10M";
     my $format = "ttl";
-    if ($OPT{N}) {
-	$format = "nt";
-    } elsif ($OPT{o}) {
-	$format = "owl";
-    } elsif ($OPT{x}) {
+    if ($OPT{x}) {
 	$format = "xml";
+    }
+    if ($OPT{F}) {
+	$format = $OPT{F};
     }
     if (! -t) {
 	print "# Input: STDIN\n";
