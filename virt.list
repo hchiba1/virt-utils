@@ -25,6 +25,7 @@ get_top_list();
 
 inspect_virt_ini("/work");
 inspect_virt_ini("/opt/virtuoso");
+inspect_virt_ini("/data/virtuoso");
 inspect_virt_ini("$ENV{HOME}/work/virtuoso");
 inspect_virt_ini("$ENV{HOME}/virtuoso");
 
