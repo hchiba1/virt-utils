@@ -25,7 +25,7 @@ get_top_list();
 
 inspect_virt_ini("/work");
 inspect_virt_ini("/opt/virtuoso");
-inspect_virt_ini("/data/virtuoso");
+inspect_virt_ini("/db/virtuoso");
 inspect_virt_ini("$ENV{HOME}/work/virtuoso");
 inspect_virt_ini("$ENV{HOME}/virtuoso");
 
@@ -88,7 +88,7 @@ sub print_virt_info {
     if (@port == 0) {
     } elsif (@port == 2) {
         my ($isql_port, $http_port) = @port;
-        print "  [HTTP] $http_port [ISQL] $isql_port";
+        print "  [ISQL] $isql_port [HTTP] $http_port";
         print "\n";
     } else {
         die;
