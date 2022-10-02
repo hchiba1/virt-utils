@@ -221,7 +221,9 @@ sub isql {
             }
         } elsif ($opt{extract_line} eq "multi") {
             my @line = extract_lines_from_results($result);
-            print join("\n", @line), "\n";
+            if (@line) {
+                print join("\n", @line), "\n";
+            }
         } elsif ($opt{extract_line} eq "rules") {
             print extract_rules_from_results($result);
         } elsif ($opt{extract_line} eq "time_1") {
@@ -321,11 +323,7 @@ sub extract_lines_from_results {
         push @content, $result[$i];
     }
 
-    if (@content) {
-        return @content;
-    } else {
-        return @result;
-    }
+    return @content;
 }
 
 sub read_ini_file {
