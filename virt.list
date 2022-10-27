@@ -87,7 +87,10 @@ sub print_virt_info {
     print "\n";
     print "$inspect_dir/$db_dir/";
     if ($DB_NAME{"$inspect_dir/$db_dir"}) {
-        print " => ",$DB_NAME{"$inspect_dir/$db_dir"}, "";
+        print " => ", $DB_NAME{"$inspect_dir/$db_dir"};
+    }
+    if ($PS{$virt_pid}) {
+        print " (*)";
     }
     print "\n";
     
