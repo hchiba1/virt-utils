@@ -17,6 +17,9 @@ if ($OPT{h}) {
     die $USAGE;
 }
 
+my %DB_NAME;
+read_db_names("$ENV{HOME}/.virt/db", \%DB_NAME);
+
 my %PS = ();
 get_ps_list();
 
@@ -66,10 +69,10 @@ sub inspect_virt_ini {
             my $virt_pid = get_virt_pid($db_dir) || 0;
             if ($OPT{v}) {
                 if (!$PS{$virt_pid}) {
-                    print_virt_info($virt_ini, $db_dir, $virt_pid);
+                    print_virt_info($inspect_dir, $virt_ini, $db_dir, $virt_pid);
                 }
             } elsif ($OPT{a} or $PS{$virt_pid}) {
-                print_virt_info($virt_ini, $db_dir, $virt_pid);
+                print_virt_info($inspect_dir, $virt_ini, $db_dir, $virt_pid);
             }
         } else {
             die;
@@ -79,9 +82,14 @@ sub inspect_virt_ini {
 }
 
 sub print_virt_info {
-    my ($virt_ini, $db_dir, $virt_pid) = @_;
+    my ($inspect_dir, $virt_ini, $db_dir, $virt_pid) = @_;
 
-    print "\n$db_dir/\n";
+    print "\n";
+    print "$inspect_dir/$db_dir/";
+    if ($DB_NAME{"$inspect_dir/$db_dir"}) {
+        print " => ",$DB_NAME{"$inspect_dir/$db_dir"}, "";
+    }
+    print "\n";
     
     my @port = `cat $virt_ini | grep '^ServerPort' | cut 3`;
     chomp(@port);
@@ -155,4 +163,28 @@ sub get_virt_pid {
             die;
         }
     }
+}
+
+sub read_db_names {
+    my ($file, $r_hash) = @_;
+
+    if (! -f $file) {
+	return;
+    }
+
+    open(FILE, "$file") || die;
+    while (<FILE>) {
+	chomp;
+	if (/^\s*$/) {
+	    next;
+	}
+	if (/^\s*#/) {
+	    next;
+	}
+	my ($db_name, $db_dir) = split;
+	${$r_hash}{$db_dir} = $db_name;
+    }
+    close(FILE);
+
+    return;
 }
