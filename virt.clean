@@ -4,11 +4,23 @@ use File::Basename;
 use Getopt::Std;
 my $PROGRAM = basename $0;
 my $USAGE=
-"Usage: $PROGRAM
+"Usage: $PROGRAM [DB_NAME]
 ";
 
 my %OPT;
 getopts('', \%OPT);
+
+my %DB_DIR;
+read_db_settings("$ENV{HOME}/.virt/db", \%DB_DIR);
+
+if (@ARGV) {
+    my ($db_name) = @ARGV;
+    my $db_dir = $DB_DIR{$db_name};
+    if ($db_dir and -d "$db_dir") {
+        chdir($db_dir) || die "$db_dir: $!";
+        print STDERR "$db_dir\n";
+    }
+}
 
 my @FILE = ("virtuoso.db", "virtuoso-temp.db", "virtuoso.trx", "virtuoso.pxa");
 
@@ -20,4 +32,32 @@ for my $file (@FILE) {
             print STDERR "could not remove $file\n";
         }
     }
+}
+
+################################################################################
+### Function ###################################################################
+################################################################################
+
+sub read_db_settings {
+    my ($file, $r_hash) = @_;
+
+    if (! -f $file) {
+	return;
+    }
+
+    open(FILE, "$file") || die;
+    while (<FILE>) {
+	chomp;
+	if (/^\s*$/) {
+	    next;
+	}
+	if (/^\s*#/) {
+	    next;
+	}
+	my ($db_name, $db_dir) = split;
+	${$r_hash}{$db_name} = $db_dir;
+    }
+    close(FILE);
+
+    return;
 }
