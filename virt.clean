@@ -14,8 +14,13 @@ my %DB_DIR;
 read_db_settings("$ENV{HOME}/.virt/db", \%DB_DIR);
 
 if (@ARGV) {
-    my ($db_name) = @ARGV;
-    my $db_dir = $DB_DIR{$db_name};
+    my $db_dir;
+    if ($ARGV[0] =~ /\//) {
+        $db_dir = $ARGV[0];
+    } else {
+        my ($db_name) = @ARGV;
+        $db_dir = $DB_DIR{$db_name};
+    }
     if ($db_dir and -d "$db_dir") {
         chdir($db_dir) || die "$db_dir: $!";
         print STDERR "$db_dir\n";
