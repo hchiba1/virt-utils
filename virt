@@ -9,7 +9,7 @@ my $USAGE=
        $PROGRAM DB 'ISQL COMMAND;'
        $PROGRAM DB -e 'QUERY'
        $PROGRAM DB [OPTION]
-       $PROGRAM DB [start|stop|clear]
+       $PROGRAM DB [start[ wait]|stop|clear]
 -G : show graphs (bug?)
 -G http://graph : count triples of graph
 -D http://graph : delete graph
@@ -92,22 +92,25 @@ my $VIRTUOSO_COMMAND;
 my $ISQL;
 if ($SERVER_ROOT =~ /^ServerRoot\s*= *(\S+)\/var\/lib\/virtuoso\/vsp$/) {
     my $dir = $1;
-    $VIRTUOSO_COMMAND = "$dir/bin/virtuoso-t +wait";
+    $VIRTUOSO_COMMAND = "$dir/bin/virtuoso-t";
     $ISQL = "$dir/bin/isql $PORT $USER $PASS";
 } elsif (-f "$ENV{VIRTUOSO_DB}/../bin/virtuoso") {
-    $VIRTUOSO_COMMAND = "$ENV{VIRTUOSO_DB}/../bin/virtuoso +wait";
+    $VIRTUOSO_COMMAND = "$ENV{VIRTUOSO_DB}/../bin/virtuoso";
     $ISQL = "$ENV{VIRTUOSO_DB}/../bin/isql $PORT $USER $PASS"
 } else {
     die $SERVER_ROOT;
 }
 
 ### Check second argument ###
-# [start|stop|clear] -> specific operation
+# start[ wait]|stop|clear -> specific operation
 if (@ARGV && $ARGV[0] eq "start") {
     print "$SERVER_ROOT";
     chdir $ENV{VIRTUOSO_DB} || die "ERROR: Can't chdir to $ENV{VIRTUOSO_DB}\n";
     if (! -e $HTTP_LOG_DIR) {
 	mkdir $HTTP_LOG_DIR || die;
+    }
+    if (@ARGV == 2 && $ARGV[1] eq "wait") {
+        $VIRTUOSO_COMMAND .= " +wait";
     }
     print "$VIRTUOSO_COMMAND\n";
     system "$VIRTUOSO_COMMAND";
