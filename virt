@@ -24,6 +24,7 @@ my $USAGE=
 # -P: print settings without newline
 # -t: extract time
 # -s: SPARQL from STDIN # query should be saved in tmp file to pass isql.
+# -E 'QUERY' : explain query
 # virt -V: list DBs
 
 ################################################################################
@@ -138,7 +139,7 @@ if (@ARGV && $ARGV[0] eq "start") {
 
 ### Options ###
 my %OPT;
-getopts('e:GC:D:rRdpPtsiIc', \%OPT);
+getopts('e:GC:D:rRdpPtsiIcE:', \%OPT);
 
 if ($OPT{p}) {
     print $ENV{VIRTUOSO_DB}, "\n";
@@ -183,6 +184,8 @@ if ($OPT{r}) {
     isql(join("\n", "log_enable(2);", "sparql clear graph <$OPT{D}>;", "checkpoint;"), extract_line => "times_3");
 } elsif ($OPT{e}) {
     isql("SPARQL $OPT{e};", extract_line => "multi");
+} elsif ($OPT{E}) {
+    isql("explain('SPARQL $OPT{E}');", extract_line => "multi");
 } elsif (! -t) {
     if ($OPT{s}) {
 	my @query = <STDIN>;
