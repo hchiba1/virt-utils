@@ -26,6 +26,7 @@ get_ps_list();
 my %TOP = ();
 get_top_list();
 
+my $COUNT = 0;
 inspect_virt_ini("/work");
 inspect_virt_ini("/opt/virtuoso");
 inspect_virt_ini("/db/virtuoso");
@@ -50,7 +51,6 @@ sub inspect_virt_ini {
     if (!-d $inspect_dir) {
         return;
     }
-    print "[$inspect_dir/]\n";
     chdir($inspect_dir);
 
     my @virt_ini_list = `ls */virtuoso.ini 2>/dev/null`;
@@ -67,6 +67,9 @@ sub inspect_virt_ini {
         push(@virt_ini_list, @list);
     }
 
+    if ($COUNT && @virt_ini_list) {
+        print "\n";
+    }
     for my $virt_ini (@virt_ini_list) {
         if ($virt_ini =~ /^(\S+)\/\S+$/) {
             my $db_dir = $1;
@@ -82,13 +85,14 @@ sub inspect_virt_ini {
             die;
         }
     }
-    print "\n";
 }
 
 sub print_virt_info {
     my ($inspect_dir, $virt_ini, $db_dir, $virt_pid) = @_;
 
-    print "\n";
+    if ($COUNT) {
+        print "\n";
+    }
     print "$inspect_dir/$db_dir/";
     if ($DB_NAME{"$inspect_dir/$db_dir"}) {
         print " => ", $DB_NAME{"$inspect_dir/$db_dir"};
@@ -122,6 +126,8 @@ sub print_virt_info {
         print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
         print "\n";
     }
+
+    $COUNT++;
 }
 
 sub get_ps_list {
