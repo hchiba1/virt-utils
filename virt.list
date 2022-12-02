@@ -119,7 +119,8 @@ sub print_virt_info {
     if (@port == 0) {
     } elsif (@port == 2) {
         my ($isql_port, $http_port) = @port;
-        print "  [ISQL] $isql_port [HTTP] $http_port";
+        print "  [HTTP] $http_port";
+        print "  [ISQL] $isql_port";
         print "\n";
     } else {
         die;
