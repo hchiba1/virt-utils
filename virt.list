@@ -31,7 +31,6 @@ my $ALL = 0;
 inspect_virt_ini("/work");
 inspect_virt_ini("/opt/virtuoso");
 inspect_virt_ini("/db/virtuoso");
-inspect_virt_ini("$ENV{HOME}/work");
 inspect_virt_ini("/mnt/hdd/chiba/virtuoso");
 
 if (@ARGV) {
