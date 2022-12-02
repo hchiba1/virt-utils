@@ -135,7 +135,8 @@ sub print_virt_info {
         print "\n";
     }
     if ($PS{$virt_pid}) {
-        print "  [",$PS{user}{$virt_pid}, "] $virt_pid";
+        print "  [user] ", $PS{user}{$virt_pid};
+        print "  [PID] $virt_pid";
         print "\n";
     }
 
