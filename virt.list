@@ -6,12 +6,11 @@ my $PROGRAM = basename $0;
 my $USAGE=
 "Usage: $PROGRAM [WORK_DIR]
 -a: show all
--v: instances not working
 -h: help
 ";
 
 my %OPT;
-getopts('avh', \%OPT);
+getopts('ah', \%OPT);
 
 if ($OPT{h}) {
     die $USAGE;
@@ -74,11 +73,7 @@ sub inspect_virt_ini {
         if ($virt_ini =~ /^(\S+)\/\S+$/) {
             my $db_dir = $1;
             my $virt_pid = get_virt_pid($db_dir) || 0;
-            if ($OPT{v}) {
-                if (!$PS{$virt_pid}) {
-                    print_virt_info($inspect_dir, $virt_ini, $db_dir, $virt_pid);
-                }
-            } elsif ($OPT{a} or $PS{$virt_pid}) {
+            if ($OPT{a} or $PS{$virt_pid}) {
                 print_virt_info($inspect_dir, $virt_ini, $db_dir, $virt_pid);
             }
         } else {
