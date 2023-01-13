@@ -39,7 +39,7 @@ for my $line (`virt $ARGV[0] 'select * from db.dba.load_list;'`) {
 	print $line, "\n";
     } elsif ($line =~ /^$/) {
     } elsif ($line =~ /^SQL> $/) {
-    } elsif ($line !~ /http:/) {
+    } elsif ($line !~ /https?:/) {
 	if ($INDEX == 0) {
 	    next;
 	} elsif ($OPT{v}) {
