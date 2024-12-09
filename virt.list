@@ -17,6 +17,9 @@ if ($OPT{h}) {
 }
 
 my %DB_NAME;
+my %BASE_DIR;
+my @BASE_DIR;
+my %CHECKED_DB;
 read_db_names("$ENV{HOME}/.virt/db", \%DB_NAME);
 
 my %PS = ();
@@ -28,10 +31,9 @@ get_top_list();
 my $PRINTED = 0;
 my $WORKING = 0;
 my $ALL = 0;
-inspect_virt_ini("/work");
-inspect_virt_ini("/opt/virtuoso");
-inspect_virt_ini("/db/virtuoso");
-inspect_virt_ini("/mnt/hdd/chiba/virtuoso");
+for my $dir (@BASE_DIR) {
+    inspect_virt_ini($dir);
+}
 
 if (@ARGV) {
     my ($dir) = @ARGV;
@@ -84,6 +86,10 @@ sub inspect_virt_ini {
     for my $virt_ini (@virt_ini_list) {
         if ($virt_ini =~ /^(\S+)\/\S+$/) {
             my $db_dir = $1;
+            if ($CHECKED_DB{"$inspect_dir/$db_dir/"}) {
+                next;
+            }
+            $CHECKED_DB{"$inspect_dir/$db_dir/"} = 1;
             my $virt_pid = get_virt_pid($db_dir) || 0;
             if ($PS{$virt_pid}) {
                 $WORKING++;
@@ -209,6 +215,13 @@ sub read_db_names {
 	}
 	my ($db_name, $db_dir) = split;
 	${$r_hash}{$db_dir} = $db_name;
+        if ($db_dir =~ /(.*)\//) {
+            my ($dir) = $1;
+            if (!$BASE_DIR{$dir}) {
+                $BASE_DIR{$dir} = 1;
+                push(@BASE_DIR, $dir);
+            }
+        }
     }
     close(FILE);
 
